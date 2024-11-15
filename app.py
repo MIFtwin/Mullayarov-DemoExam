@@ -1,50 +1,44 @@
-from datetime import date
-from typing import Annotated
-from pydantic import BaseModel
 from fastapi import FastAPI, Form
+from pydantic import BaseModel
+from typing import Annotated
+import datetime
 
 app = FastAPI()
 
 class Order(BaseModel):
     number: int
-    startDate: date  # Обратите внимание на имя поля и тип
+    startDate: datetime.date
     device: str
     problemType: str
     description: str
     client: str
     status: str
 
-# Пример данных
-repo = [
-    Order(
-        number=1,
-        startDate="2024-11-14",  # Передаем как строку, Pydantic автоматически преобразует
-        device="123",
-        problemType="345",
-        description="678",
-        client="Ил",
-        status="В ожидании"
-    )
-]
-
-# Эндпоинт для отображения данных из repo
-@app.get("/orders")
-def get_orders():
-    return repo
-
+repo = []
 
 @app.post("/orders")
-def create_order(dto : Annotated[Order,  Form()]):
-    repo.append(dto)
+def create_order(
+    number: Annotated[int, Form()],
+    startDate: Annotated[datetime.date, Form()],
+    device: Annotated[str, Form()],
+    problemType: Annotated[str, Form()],
+    description: Annotated[str, Form()],
+    client: Annotated[str, Form()],
+    status: Annotated[str, Form()],
+):
+    order = Order(
+        number=number,
+        startDate=startDate,
+        device=device,
+        problemType=problemType,
+        description=description,
+        client=client,
+        status=status,
+    )
+    repo.append(order)
+    return {"message": "Order created successfully"}
 
-
-
-
-
- 
-app = FastAPI()
- 
 @app.get("/orders")
 def get_orders():
-    
     return repo
+
